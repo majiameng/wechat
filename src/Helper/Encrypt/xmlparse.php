@@ -1,32 +1,32 @@
 <?php
 namespace tinymeng\Wechat\Helper\Encrypt;
+use DOMDocument;
 
 /**
  * XMLParse class
- *
  * 提供提取消息格式中的密文及生成回复消息格式的接口.
  */
-class XMLParse
+class XmLParse
 {
-
 	/**
 	 * 提取出xml数据包中的加密消息
 	 * @param string $xmltext 待提取的xml字符串
 	 * @return string 提取出的加密消息字符串
 	 */
 	public function extract($xmltext)
-	{
-		libxml_disable_entity_loader(true);
+	{ 
 		try {
 			$xml = new DOMDocument();
 			$xml->loadXML($xmltext);
 			$array_e = $xml->getElementsByTagName('Encrypt');
-			$array_a = $xml->getElementsByTagName('ToUserName');
+			$array_a = $xml->getElementsByTagName('AppId');//AppId ToUserName
 			$encrypt = $array_e->item(0)->nodeValue;
 			$tousername = $array_a->item(0)->nodeValue;
+
 			return array(0, $encrypt, $tousername);
+		 
 		} catch (Exception $e) {
-			//print $e . "\n";
+			 print $e . "\n";
 			return array(ErrorCode::$ParseXmlError, null, null);
 		}
 	}
@@ -49,7 +49,15 @@ class XMLParse
 		return sprintf($format, $encrypt, $signature, $timestamp, $nonce);
 	}
 
+    /**
+     * 解析XML数据
+     * Author: JiaMeng <666@majiameng.com>
+     * Updater：
+     * @param $xml
+     * @return mixed
+     */
+    public function xmlToArray($xml){
+        libxml_disable_entity_loader(true);
+        return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA), JSON_UNESCAPED_UNICODE), true);
+    }
 }
-
-
-?>

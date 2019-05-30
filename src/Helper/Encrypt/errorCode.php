@@ -1,6 +1,5 @@
 <?php
 namespace tinymeng\Wechat\Helper\Encrypt;
-
 /**
  * error code 说明.
  * <ul>
