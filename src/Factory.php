@@ -20,7 +20,7 @@ use tinymeng\Wechat\Helper\Str;
  * @method static \tinymeng\Wechat\BasicService\Application       basicService(array $config)
  * @method static \tinymeng\Wechat\Work\Application               work(array $config)
  */
-class Factory
+abstract class Factory
 {
     /**
      * @param string $name
@@ -36,16 +36,15 @@ class Factory
             'callback'  => '',
             'scope'     => '',
         ];
-//        $namespace = Str::uFirst($name);
 
-        $application = "\\tinymeng\Wechat\\{$name}\Application";
+        $application = __NAMESPACE__."\\{$name}\Application";
         if (class_exists($application)) {
-//            $app = new $class(array_replace_recursive($baseConfig,$config));
+            $app = new $application(array_replace_recursive($baseConfig,$config));
 //            if ($app instanceof GatewayInterface) {
 //                return $app;
 //            }
 //            throw new \Exception("第三方微信基类 [$gateway] 必须继承抽象类 [GatewayInterface]");
-            return new $application($config);
+            return $app;
         }
         throw new \Exception("第三方微信基类 [$application] 不存在");
     }

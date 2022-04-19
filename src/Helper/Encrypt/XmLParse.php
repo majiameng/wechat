@@ -18,13 +18,17 @@ class XmLParse
 		try {
 			$xml = new DOMDocument();
 			$xml->loadXML($xmltext);
-			$array_e = $xml->getElementsByTagName('Encrypt');
-			$array_a = $xml->getElementsByTagName('AppId');//AppId ToUserName
-			$encrypt = $array_e->item(0)->nodeValue;
+			$array_encrypt = $xml->getElementsByTagName('Encrypt');
+            if(strpos($xmltext,'AppId') !== false) {
+    			$array_a = $xml->getElementsByTagName('AppId');//AppId ToUserName
+            }elseif(strpos($xmltext,'ToUserName') !== false) {
+			    $array_a = $xml->getElementsByTagName('ToUserName');//AppId ToUserName
+            }else{
+                return array(ErrorCode::$ParseXmlError, null, null);
+            }
+			$encrypt = $array_encrypt->item(0)->nodeValue;
 			$tousername = $array_a->item(0)->nodeValue;
-
 			return array(0, $encrypt, $tousername);
-		 
 		} catch (Exception $e) {
 			 print $e . "\n";
 			return array(ErrorCode::$ParseXmlError, null, null);

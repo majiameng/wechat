@@ -2,7 +2,7 @@
 namespace tinymeng\Wechat\Connector;
 
 /**
- * 所有第三方登录必须继承的抽象类
+ * 所有第三方必须继承的抽象类
  */
 abstract class Gateway implements GatewayInterface
 {
@@ -11,30 +11,6 @@ abstract class Gateway implements GatewayInterface
      * @var array
      */
     protected $config;
-
-    /**
-     * 当前时间戳
-     * @var int
-     */
-    protected $timestamp;
-
-    /**
-     * 默认第三方授权页面样式
-     * @var string
-     */
-    protected $display = 'default';
-
-    /**
-     * 是否是App
-     * @var bool
-     */
-    protected $isapp = false;
-
-    /**
-     * 第三方Token信息
-     * @var array
-     */
-    protected $token = null;
 
     /**
      * 是否验证回跳地址中的state参数
@@ -67,82 +43,6 @@ abstract class Gateway implements GatewayInterface
         $this->timestamp = time();
     }
 
-    /**
-     * Description:  设置授权页面样式
-     * @author: JiaMeng <666@majiameng.com>
-     * Updater:
-     * @param $display
-     * @return $this
-     */
-    public function setDisplay($display)
-    {
-        $this->display = $display;
-        return $this;
-    }
-
-    /**
-     * Description:  设置是否是App
-     * @author: JiaMeng <666@majiameng.com>
-     * Updater:
-     * @return $this
-     */
-    public function setIsApp()
-    {
-        $this->isapp = true;
-        return $this;
-    }
-
-    /**
-     * Description:  强制验证回跳地址中的state参数
-     * @author: JiaMeng <666@majiameng.com>
-     * Updater:
-     * @return $this
-     */
-    public function mustCheckState()
-    {
-        $this->checkState = true;
-        return $this;
-    }
-
-    /**
-     * Description:  默认获取AccessToken请求参数
-     * @author: JiaMeng <666@majiameng.com>
-     * Updater:
-     * @return array
-     */
-    protected function accessTokenParams(){
-        $params = [
-            'client_id'     => $this->config['app_id'],
-            'client_secret' => $this->config['app_secret'],
-            'grant_type'    => $this->config['grant_type'],
-            'code'          => isset($_GET['code']) ? $_GET['code'] : '',
-            'redirect_uri'  => $this->config['callback'],
-        ];
-        return $params;
-    }
-
-    /**
-     * Description:  获取AccessToken
-     * @author: JiaMeng <666@majiameng.com>
-     * Updater:
-     */
-    protected function getToken(){
-        if (empty($this->token)) {
-            /** 验证state参数 */
-            if ($this->checkState === true) {
-                if (!isset($_GET['state']) || $_GET['state'] != $this->config['state']) {
-                    throw new \Exception('传递的STATE参数不匹配！');
-                }
-            }
-            /** 获取参数 */
-            $params = $this->accessTokenParams();
-
-            /** 获取access_token */
-            $token =  $this->POST($this->AccessTokenURL, $params);
-            /** 解析token值(子类实现此方法) */
-            $this->token = $this->parseToken($token);
-        }
-    }
 
     /**
      * Description:  执行GET请求操作

@@ -32,8 +32,22 @@
 
 #### openPlatform 开放平台
 
+* 初始化使用
 
-* 实现接受事件
+```php
+<?php
+use tinymeng\Wechat\Factory;
+    $config = [
+        'app_id' => 'wxaa40f5*******',
+        'app_secret' => '651911d4**************',
+        'token'=>'tinymeng',
+        'aes_key'=>'RrVA0dy******************************'
+    ];
+    $openPlatform = Factory::openPlatform($config);
+
+```
+
+* 处理事件
 
 ```php
 <?php
@@ -46,37 +60,46 @@ class Wechat{
      * Updater:
      */
     public function ticket(){
-        $config = [
-            'app_id' => 'wxaa40f5*******',
-            'app_secret' => '651911d4**************',
-            'token'=>'tinymeng',
-            'aes_key'=>'RrVA0dy******************************'
-        ];
+        $config = [];//同上👆
         $server = Factory::openPlatform($config)->server;
-        /** 或者这样使用 */
+        // 处理授权成功事件
 //        $server->push(function($params){
-//            //$params,为微信解密后的数据
+              /**
+               * TODO...
+               * $params 为微信推送的通知内容，不同事件不同内容，详看微信官方文档
+               * 获取授权公众号 AppId： $params['AuthorizerAppid']
+               * 获取 AuthCode：$params['AuthorizationCode']
+               * 然后进行业务处理，如存数据库等...
+               */
 //        },Guard::EVENT_AUTHORIZED);
+        /** 或者这样使用 */
+        // 处理授权成功事件
         $server->push(new TicketService(),Guard::EVENT_AUTHORIZED);
+        // 处理授权取消事件
         $server->push(new TicketService(),Guard::EVENT_UNAUTHORIZED);
+        // 处理授权更新事件
         $server->push(new TicketService(),Guard::EVENT_UPDATE_AUTHORIZED);
+        // 处理推送VerifyTicket事件 
         $server->push(new TicketService(),Guard::EVENT_COMPONENT_VERIFY_TICKET);
-        $server->serve();
-        echo "success";
+        $server->serve()->success();
     }
 }
 
 /**
- * 功能实现类
+ * 事件实现类
  */
 class TicketService{
     //$params,为微信解密后的数据
     public function authorized($params){
     }
+    public function unauthorized($params){
+    }
+    public function updateauthorized($params){
+    }
     public function component_verify_ticket($params){
     }
     public function default($params){
-        //$params,为微信解密后的数据       
+        //$params,为微信解密后的数据    
     }
 }
 
